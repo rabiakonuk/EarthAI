@@ -1,0 +1,3 @@
+[submodule "EarthAI"]
+	path = EarthAI
+	url = https://github.com/zin-hu/EarthAI.git
