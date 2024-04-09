@@ -1,0 +1,23 @@
+# infra_config.yml
+# update the info below specificaly for our environment
+
+cloud:
+  provider: 'aws'
+  region: 'us-west-2'
+  resource_allocation:
+    cpu: '4'
+    memory: '8Gb'
+    storage: '100Gb'
+
+kubernetes:
+  namespace: 'earthai-system'
+  replicas: 2
+  deployment_strategy: 'RollingUpdate'
+
+monitoring:
+  prometheus:
+    enabled: true
+    scrape_interval: '5s'
+  grafana:
+    enabled: true
+    dashboard_id: 'earthai-overview'

@@ -1,0 +1,24 @@
+# app_config.yml
+# update the info below specificly for our environment
+
+server:
+  host: '0.0.0.0'
+  port: 5000
+  debug: true
+
+model:
+  name: 'Prithvi'
+  version: '1.0'
+  inference_batch_size: 100
+
+data_processing:
+  max_batch_size: 40
+  data_path: 'path/to/our/AIRS/data'
+  preprocessing:
+    clean_missing: true
+    outlier_threshold: 2.5
+
+logging:
+  level: 'INFO'
+  format: '%(asctime)s - %(levelname)s - %(message)s'
+  log_file: 'logs/application.log'

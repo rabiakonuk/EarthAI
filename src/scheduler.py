@@ -69,6 +69,32 @@ class DynamicTaskScheduler:
                 task = heapq.heappop(self.tasks)
                 future = self.executor.submit(self.execute_task, task)
 
+    def test_task_with_dependencies(self):
+        # Test that a task with dependencies does not execute before its dependencies
+        dependent_task = Task(task_id=10, priority=1, execution_time=1, data="Dependent", dependencies=[1, 2])
+        self.scheduler.add_task(dependent_task)
+        self.scheduler.schedule_tasks()
+        # Check if the dependent task is still in the queue due to unmet dependencies
+        self.assertIn(dependent_task, self.scheduler.tasks, "Dependent task should not execute before its dependencies")
+
+    def test_resource_monitoring(self):
+        # Test that the scheduler considers resource availability before scheduling tasks
+        self.scheduler.add_resource_monitor(resource_monitor)
+        heavy_task = Task(task_id=20, priority=1, execution_time=10, data="Heavy Task", required_resources={'cpu': 90})
+        self.scheduler.add_task(heavy_task)
+        self.scheduler.schedule_tasks()
+        # Check if the heavy task is delayed due to resource constraints
+        self.assertIn(heavy_task, self.scheduler.tasks, "Heavy task should be delayed when resources are insufficient")
+
+    def test_graceful_shutdown_and_recovery(self):
+        # Test that tasks are saved during shutdown and can be recovered
+        self.scheduler.add_task(Task(task_id=30, priority=1, execution_time=5, data="Important"))
+        self.scheduler.shutdown()
+        self.scheduler.recover_tasks()
+        # Ensure tasks are present after recovery
+        self.assertNotEqual(len(self.scheduler.tasks), 0, "Tasks should be recovered after shutdown")
+
+    
     def execute_task(self, task):
         """Execute a single task."""
         logging.info(f"Executing task {task.task_id} with priority {task.priority}.")

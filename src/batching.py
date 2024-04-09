@@ -53,6 +53,27 @@ class SelectiveBatching:
         if current_batch:
             self.batches.append((current_batch_type, current_batch))
 
+    def test_homogeneous_batch_creation(self):
+        # Test that batches contain only homogeneous tasks
+        heterogeneous_tasks = [Task(task_id=i, task_type='type_A' if i % 2 == 0 else 'type_B', data_size=i) for i in range(1, 10)]
+        self.batching.create_batch(heterogeneous_tasks)
+        for batch_type, batch in self.batching.batches:
+            self.assertTrue(all(task.task_type == batch_type for task in batch), f"All tasks in the batch should be of type {batch_type}")
+
+    def test_batch_size_limit(self):
+        # Test that no batch exceeds the maximum size limit
+        tasks = [Task(task_id=i, task_type='data_processing', data_size=10) for i in range(20)]
+        self.batching.create_batch(tasks)
+        for _, batch in self.batching.batches:
+            total_size = sum(task.data_size for task in batch)
+            self.assertLessEqual(total_size, self.batching.max_batch_size, "Batch size should not exceed the maximum limit")
+
+    def test_individual_attention_task_processing(self):
+        # Test that attention tasks are executed individually
+        tasks = [Task(task_id=i, task_type='attention', data_size=30) for i in range(5)]
+        self.batching.create_batch(tasks)
+        self.assertEqual(len(self.batching.batches), len(tasks), "Each attention task should be in its own batch")
+
     def execute_batches(self):
         """
         Execute each batch of tasks. Attention tasks are executed individually while 
